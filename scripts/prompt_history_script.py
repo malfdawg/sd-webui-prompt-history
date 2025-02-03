@@ -65,9 +65,14 @@ def add_config(id: str, name: str, model: str, info_text: str, img) -> history.H
     original_prompt = h.name
     h.name = h.name[:64]
     # replace default prompts
-    info_texts = info_text.splitlines(True) 
-    info_texts[0] = original_prompt + '\n'
+    info_texts = info_text.splitlines(True)
+
+    # Only update if the first line doesn't already match the original prompt
+    if not info_texts or info_texts[0].strip() != original_prompt.strip():
+        info_texts.insert(0, original_prompt + '\n')  # Insert at the start instead of replacing
+
     h.info_text = ''.join(info_texts)
+
     
     # in case of not automatic save, we must store few items in case of manual saved
     if not global_state.automatic_save:
