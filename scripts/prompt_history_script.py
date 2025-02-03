@@ -95,8 +95,9 @@ def add_config(id: str, name: str, model: str, info_text: str, img) -> history.H
     # save to file
     save_history()
     
-    # reload the UI
-    global_state.config_changed = True
+    # reload the UI only if not already set
+    if not global_state.config_changed:
+        global_state.config_changed = True
     return h
     
 def manually_save():
@@ -151,7 +152,7 @@ def on_ui_tabs():
             with gr.Column(scale=7): 
                 # list display column
                 table = gr.HTML('Loading...')
-                ui.load(fn=history_table, inputs=[], outputs=[table, save_last_prompt_btn], every=1)
+                ui.load(fn=history_table, inputs=[], outputs=[table, save_last_prompt_btn], every=5)
                 # receiver buttons
                 item_id_text = gr.Text(elem_id="prompt_history_item_id_text", visible=False)
                 click_item_btn = gr.Button(elem_id="prompt_history_click_item_btn", visible=False)
@@ -307,7 +308,8 @@ def on_delete_item(id: str):
                     os.remove(img_path)
                 global_state.config_histories.remove(h)
     save_history()
-    global_state.config_changed = True
+    if not global_state.config_changed:
+        global_state.config_changed = True
     return []
 
 def on_click_item(id: str):
@@ -318,14 +320,16 @@ def on_click_item(id: str):
             current_code = h.info_text
             origin_code = h.info_text
             img_path = os.path.join(config_dir, f"{h.id}.jpg")
-            global_state.config_changed = True
+            if not global_state.config_changed:
+                global_state.config_changed = True
             img = Image.open(img_path) if os.path.isfile(img_path) else None
             return img, h.info_text, gr.update(visible=True)
 
-def config_changed(orginal_cfg:None, new_cfg:None):
+def config_changed(orginal_cfg, new_cfg):
     if orginal_cfg != new_cfg:
         global_state.config_changed = True
-    return new_cfg
+        return new_cfg
+    return original_cfg
     
 def history_table():
     global manual_save_history, total_pages, current_page, config_dir
