@@ -325,7 +325,7 @@ def on_click_item(id: str):
             img = Image.open(img_path) if os.path.isfile(img_path) else None
             return img, h.info_text, gr.update(visible=True)
 
-def config_changed(orginal_cfg, new_cfg):
+def config_changed(orginal_cfg:none, new_cfg:none):
     if orginal_cfg != new_cfg:
         global_state.config_changed = True
         return new_cfg
